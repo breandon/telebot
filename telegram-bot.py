@@ -3,9 +3,14 @@ import requests
 import clever_chat
 import os
 from dotenv import load_dotenv
+from parsel import Selector
 from clever_chat import Client
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
 
 TOKEN: Final = '6979522872:AAE7oPHzrlqbfuXCXFiIW_95qmoOx1R5dyQ'
 BOT_USERNAME: Final = 'breancbot'
@@ -15,65 +20,20 @@ reccoFlag = False
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('Hello! thanks for chatting with me!')
 
-
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('You can try speaking to my manager @thirteenbones')
-
 
 async def reccos_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global reccoFlag
     reccoFlag = True
     await update.message.reply_text('Sure, please enter your postal code and I\'ll recommend something!')
 
-#Chat GPT
-def answer_gpt(question):
-    return Client.get_response(question)
 
-def validatePostal(postal):
-    googleKey = os.getenv('API_KEY') 
-	
-    payload = {
-		"address": {
-			"postalCode": postal,
-			"addressLines": ["Singapore"]
-		},
-		"enableUspsCass": False # set to True for US addresses
-	}
+#error handling
+async def error(update: Update, context:ContextTypes.DEFAULT_TYPE):
+    print (f'Update {update} caused error {context.error}')
 
-    url = "https://addressvalidation.googleapis.com/v1:validateAddress?key=" + googleKey
-	
-    response = requests.post(url, json=payload)
-    status = response.json()['result']['address']['addressComponents'][1]['confirmationLevel']
-
-    print(status)       
-    if status == 'CONFIRMED':
-        return True
-    return False
-	
-    
-def handle_reccos(postal):
-    if validatePostal(postal) is True:
-        return "Opps I am still building the feature to recommend food"
-    return "Enter your postal properly leh or just type /quit to quit reccos"
-
-#Responses
-def handle_response(text: str) -> str:
-    global reccoFlag
-    processed: str = text.lower()
-
-    if '/quit' == processed:
-            if reccoFlag is True:
-                reccoFlag = False
-                return "Ok lor I stop recommending..."
-            else:
-                return 'Don\'t gaslight leh you didn\'t ask for recommendations..'
-    
-    if reccoFlag is True:
-        return handle_reccos(processed)
-      
-    return answer_gpt(processed)
-
-
+#Handle Responses
 async def handle_message(update: Update, context:ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
     text: str = update.message.text
@@ -93,9 +53,58 @@ async def handle_message(update: Update, context:ContextTypes.DEFAULT_TYPE):
     print('Bot:', response)
     await update.message.reply_text(response)
 
+def handle_response(text: str) -> str:
+    global reccoFlag
+    processed: str = text.lower()
 
-async def error(update: Update, context:ContextTypes.DEFAULT_TYPE):
-    print (f'Update {update} caused error {context.error}')
+    if '/quit' == processed:
+            if reccoFlag is True:
+                reccoFlag = False
+                return "Ok lor I stop recommending..."
+            else:
+                return 'Don\'t gaslight leh you didn\'t ask for recommendations..'
+    
+    if reccoFlag is True:
+        return handleRecommendations(processed)
+    return Client.get_response(processed)
+
+def handleRecommendations(postal):
+    googleKey = os.getenv('API_KEY') 
+    payload = {
+		"address": {
+			"postalCode": postal,
+			"addressLines": ["Singapore"]
+		},
+		"enableUspsCass": False # set to True for US addresses
+	}
+    url = "https://addressvalidation.googleapis.com/v1:validateAddress?key=" + googleKey
+    response = requests.post(url, json=payload)
+    status = response.json()['result']['address']['addressComponents'][1]['confirmationLevel']
+     
+    if status != 'CONFIRMED':
+        return "Enter your postal properly leh or just type /quit to quit reccos"
+
+    geocode = response.json()['result']['geocode']['location']
+    lat = str(geocode['latitude'])
+    longi = str(geocode['longitude'])
+    url = ("https://www.google.com/maps/search/best+food+near+"+postal+"/@"+lat+","+longi+",13z/data=!3m1!4b1?entry=ttu")
+
+    #Scrape results
+
+    options = Options()
+    options.add_argument('--headless=new')
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    results = "How about the following:\n"
+    page_content = driver.page_source
+    response = Selector(page_content)
+    for el in response.xpath('//div[contains(@aria-label, "Results for")]/div/div[./a]'):
+        results = results + (el.xpath('./a/@aria-label').extract_first('')) + "\n"
+        results = results + el.xpath('./a/@href').extract_first('')+ "\n"
+        results = results + "\n"
+
+    driver.close()
+    return results
 
 
 if __name__=='__main__':
