@@ -2,6 +2,7 @@ from typing import Final
 import requests
 import clever_chat
 import os
+import random
 from dotenv import load_dotenv
 from parsel import Selector
 from clever_chat import Client
@@ -84,13 +85,9 @@ def handleRecommendations(postal):
     if status != 'CONFIRMED':
         return "Enter your postal properly leh or just type /quit to quit reccos"
 
-    geocode = response.json()['result']['geocode']['location']
-    lat = str(geocode['latitude'])
-    longi = str(geocode['longitude'])
-    url = ("https://www.google.com/maps/search/best+food+near+"+postal+"/@"+lat+","+longi+",13z/data=!3m1!4b1?entry=ttu")
+    url = (queryGenerator() +postal)
 
     #Scrape results
-
     options = Options()
     options.add_argument('--headless=new')
     driver = webdriver.Chrome(options=options)
@@ -106,6 +103,13 @@ def handleRecommendations(postal):
     driver.close()
     return results
 
+def queryGenerator():
+    list = ["https://www.google.com/maps/search/best+food+near+",
+            "https://www.google.com/maps/search/what+to+eat+near+",
+            "https://www.google.com/maps/search/good+food+near+",
+            "https://www.google.com/maps/search/whats+nice+to+eat+near+",
+            "https://www.google.com/maps/search/+food+near+"]
+    return  random.choice(list)
 
 if __name__=='__main__':
     app = Application.builder().token(TOKEN).build()
