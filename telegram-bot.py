@@ -46,13 +46,13 @@ async def handle_message(update: Update, context:ContextTypes.DEFAULT_TYPE):
         else:
             return
     else:
-        response: str = handle_response(text)
+        response: str = handle_response(update, text)
 
 
     print('Bot:', response)
     await update.message.reply_text(response)
 
-def handle_response(text: str) -> str:
+def handle_response(update: Update, text: str) -> str:
     global reccoFlag
     processed: str = text.lower()
 
@@ -64,6 +64,8 @@ def handle_response(text: str) -> str:
                 return 'Don\'t gaslight leh you didn\'t ask for recommendations..'
     
     if reccoFlag is True:
+        chatId = str(update.message.chat.id)
+        requests.get("https://api.telegram.org/bot"+str(TOKEN)+"/sendMessage?chat_id="+chatId+"&text=Wait ah, it\'ll take some time...")
         return handleRecommendations(processed)
     return Client.get_response(processed)
 
