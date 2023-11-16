@@ -126,7 +126,6 @@ if __name__=='__main__':
     app.add_error_handler(error)
 
     #Polls the bot https://docs.python-telegram-bot.org/en/v20.6/telegram.ext.application.html
-    app.run_polling(poll_interval=3)
     app.run_webhook(
         listen='0.0.0.0',
         port=os.getenv('PORT') ,
