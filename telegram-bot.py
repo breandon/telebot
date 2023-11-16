@@ -17,9 +17,6 @@ TOKEN: Final = '6979522872:AAE7oPHzrlqbfuXCXFiIW_95qmoOx1R5dyQ'
 BOT_USERNAME: Final = 'breancbot'
 reccoFlag = False
 
-updater = Updater(token=TOKEN)
-updater.start_webhook(listen='0.0.0.0', port=8443, url_path=TOKEN)
-
 # Commands
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
