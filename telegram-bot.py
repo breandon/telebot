@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from parsel import Selector
 from clever_chat import Client
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Updater, Application, CommandHandler, MessageHandler, filters, ContextTypes
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -16,6 +16,9 @@ from selenium.webdriver.common.by import By
 TOKEN: Final = '6979522872:AAE7oPHzrlqbfuXCXFiIW_95qmoOx1R5dyQ'
 BOT_USERNAME: Final = 'breancbot'
 reccoFlag = False
+
+updater = Updater(token=TOKEN)
+updater.start_webhook(listen='0.0.0.0', port=8443, url_path=TOKEN)
 
 # Commands
 
