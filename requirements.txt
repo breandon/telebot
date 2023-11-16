@@ -11,7 +11,7 @@ cssselect==1.2.0
 h11==0.14.0
 parsel==1.8.1
 PySocks==1.7.1
-python-dotenv==1.0.0
+python-dotenv @
 python-telegram-bot==20.6
 requests==2.31.0
 requests-toolbelt==1.0.0
