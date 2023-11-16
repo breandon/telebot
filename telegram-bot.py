@@ -18,11 +18,9 @@ BOT_USERNAME: Final = 'breancbot'
 reccoFlag = False
 
 # Commands
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Hello! thanks for chatting with me!')
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('You can try speaking to my manager @thirteenbones')
+    await update.message.reply_text('You can try chatting or type /reccos for some food recommendation!')
 
 async def reccos_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global reccoFlag
@@ -116,7 +114,6 @@ if __name__=='__main__':
 
     load_dotenv()   
     #Commands
-    app.add_handler(CommandHandler('start', start_command))
     app.add_handler(CommandHandler('help', help_command))
     app.add_handler(CommandHandler('reccos', reccos_command))
 
