@@ -101,8 +101,6 @@ def handleRecommendations(postal):
         results = results + "\n"
 
     driver.close()
-    global reccoFlag
-    reccoFlag = False
     return results
 
 def queryGenerator():
