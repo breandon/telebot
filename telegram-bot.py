@@ -48,7 +48,6 @@ async def handle_message(update: Update, context:ContextTypes.DEFAULT_TYPE):
     else:
         response: str = handle_response(update, text)
 
-
     print('Bot:', response)
     await update.message.reply_text(response)
 
@@ -104,11 +103,11 @@ def handleRecommendations(postal):
     return results
 
 def queryGenerator():
-    list = ["https://www.google.com/maps/search/best+food+near+",
-            "https://www.google.com/maps/search/what+to+eat+near+",
-            "https://www.google.com/maps/search/good+food+near+",
-            "https://www.google.com/maps/search/whats+nice+to+eat+near+",
-            "https://www.google.com/maps/search/+food+near+"]
+    list = ["https://www.google.com/maps/search/best+food+near+singapore+",
+            "https://www.google.com/maps/search/what+to+eat+near+singapore+",
+            "https://www.google.com/maps/search/good+food+near+singapore+",
+            "https://www.google.com/maps/search/whats+nice+to+eat+near+singapore+",
+            "https://www.google.com/maps/search/+food+near+singapore+"]
     return  random.choice(list)
 
 if __name__=='__main__':
