@@ -41,3 +41,4 @@ webdriver-manager==4.0.1
 webdrivermanager==0.10.0
 wsproto==1.2.0
 yarl==1.9.2
+gunicorn==19.7.1
