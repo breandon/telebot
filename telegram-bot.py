@@ -11,13 +11,11 @@ from telegram.ext import Updater, Application, CommandHandler, MessageHandler, f
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from flask import Flask
 
 
 TOKEN: Final = '6979522872:AAE7oPHzrlqbfuXCXFiIW_95qmoOx1R5dyQ'
 BOT_USERNAME: Final = 'breancbot'
 reccoFlag = False
-app = Flask(__name__)
 
 # Commands
 
